@@ -1,24 +1,28 @@
-# Stage 1: Build Angular App
-FROM node:14 as builder
+# Use Node.js base image
+FROM node:14
 
+# Set working directory
 WORKDIR /app
 
+# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
 
+# Copy the entire source code
 COPY . .
+
+# Build the Angular app (production mode)
 RUN npm run build --prod
 
-# Stage 2: Serve with http-server
-FROM node:14-alpine
-
+# Install http-server to serve the built app
 RUN npm install -g http-server
 
-WORKDIR /app
+# Set working directory to the Angular build output
+WORKDIR /app/dist/angular-15-crud
 
-# Copy the correct Angular build output
-COPY --from=builder /app/dist/angular-15-crud /app
-
+# Expose the port the app runs on
 EXPOSE 8081
 
-CMD ["http-server", "/app", "-p", "8081"]
+# Start the server
+CMD ["http-server", "-p", "8081"]
+
